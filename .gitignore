@@ -1,0 +1,5 @@
+libqth.a
+libqth.so
+qthlib.o
+test/qthtest
+test/qthtest_dyn
