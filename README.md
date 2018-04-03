@@ -1,9 +1,9 @@
 # qth-tail-head - Tail-Head Queue library
 
 ## Synopsis
-Queue library that provides O(1) add t head, add to tail, and remove head operations.
+Queue library that provides O(1) add to head, add to tail, and remove head operations.
 
-This queue lib manages the allocation and freeing of the queue header and linkage.
+This queue library manages the allocation and freeing of the queue header and linkage.
 The user does not add links to their own structures or manage a queue header.
 
 This queue manager uses the data poiners passed in and does not copy the data.
