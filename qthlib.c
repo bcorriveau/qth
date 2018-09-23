@@ -4,6 +4,7 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "qthlib.h"
 
@@ -60,7 +61,7 @@ typedef struct qthhdr_s {
  *
  */
 QTHERR
-qthinit(qthhdl_t *qthhdlp, void *(*alloc)(unsigned long), void (*free)(void *))
+qth_init(qthhdl_t *qthhdlp, void *(*alloc)(unsigned long), void (*free)(void *))
 {
     *qthhdlp = alloc(sizeof(struct qthhdr_s));
     if (*qthhdlp) {
@@ -77,7 +78,7 @@ qthinit(qthhdl_t *qthhdlp, void *(*alloc)(unsigned long), void (*free)(void *))
  * Adds to the head of the queue (LIFO or stack style)
  *
  * \details
- * Allocs a q link for the given data and adds it to the front of the queue
+ * Allocates a q link for the given data and adds it to the front of the queue
  *
  * \param[in]       qthhdl    handle to q
  * \param[in]       datap     user data to add to queue
@@ -86,7 +87,7 @@ qthinit(qthhdl_t *qthhdlp, void *(*alloc)(unsigned long), void (*free)(void *))
  *
  */
 QTHERR
-qthheadadd(qthhdl_t qthhdl, void *datap)
+qth_addh(qthhdl_t qthhdl, void *datap)
 {
     qthlink_t *new, *tail, *head;
 
@@ -121,7 +122,7 @@ qthheadadd(qthhdl_t qthhdl, void *datap)
  *
  */
 QTHERR
-qthtailadd(qthhdl_t qthhdl, void *datap)
+qth_add(qthhdl_t qthhdl, void *datap)
 {
     qthlink_t *new, *tail, *head;
 
@@ -142,6 +143,7 @@ qthtailadd(qthhdl_t qthhdl, void *datap)
     return QTHERR_OK;
 }
 
+
 /**
  * \brief
  * Removes the head of the queue
@@ -151,13 +153,13 @@ qthtailadd(qthhdl_t qthhdl, void *datap)
  * data pointer
  *
  * \param[in]       qthhdl    handle to q
- * \param[out]      qerr      user data to add to queue
+ * \param[out]      qerr      QTHERR_OK or error code for operation
  *
  * \return          The data pointer from the removed head of the queue
  *
  */
 void *
-qthheadrem(qthhdl_t qthhdl, QTHERR *qerr)
+qth_remove(qthhdl_t qthhdl, QTHERR *qerr)
 {
     qthlink_t *tail, *head;
     void      *datap;
@@ -186,18 +188,64 @@ qthheadrem(qthhdl_t qthhdl, QTHERR *qerr)
 
 /**
  * \brief
+ * Iterate through data elements in the queue
+ *
+ * \details
+ * Returns the data element from the queue, sets the q handle
+ * for the next call iterate call.
+ *
+ * \param[in]       qthhdl    pointer to handle to q for iterating
+ * \param[in,out]   iterp     pointer to the iterator
+ *
+ * \return          The current data pointer from the queue, NULL if no more
+ *
+ * \note            Set the *iterp to the queue handle to start the iteration
+ *
+ */
+void *
+qth_iter(qthhdl_t qthhdl, void **iterp)
+{
+    void        *datap;
+    qthlink_t   *next;
+
+    /* if first iteration set the iter to the head of the queue */
+    if (qthhdl == *iterp) {
+        next = (qthlink_t *)qthhdl->link->link;
+    } else {
+        next = (qthlink_t *) *iterp;
+    }
+
+    /* get the data and set up for the next iteration */
+    if (next) {
+        datap = next->datap;
+        *iterp = next->link;
+        /* if back at the head then we are done */
+        if (*iterp == qthhdl->link->link) {
+            *iterp = NULL;
+        }
+    } else {
+        datap = NULL;
+    }
+
+    return datap;
+}
+
+
+/**
+ * \brief
  * Frees queue
  *
  * \details
- * Frees all queue linkage and the queue handle. Does not free the data elements.
+ * Frees any queue elements, and the queue handle.
  *
- * \param[in]       qthhdl    handle to q
+ * \param[in]       qthhdl          handle to q
  *
- * \return          QTHERR_OK on success
+ * \return          QTHERR_OK       on success
+ *                  QTHERR_EMPTY    if queue was aleady empty (header freed)
  *
  */
 QTHERR
-qthfree(qthhdl_t qthhdl)
+qth_free(qthhdl_t qthhdl)
 {
     qthlink_t *tail, *head, *link;
 

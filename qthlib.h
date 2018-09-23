@@ -53,7 +53,7 @@ typedef enum {
  *
  */
 QTHERR
-qthinit(qthhdl_t *qthhdlp, void *(*alloc)(unsigned long), void (*free)(void *ptr));
+qth_init(qthhdl_t *qthhdlp, void *(*alloc)(unsigned long), void (*free)(void *ptr));
 
 /**
  * \brief
@@ -69,7 +69,7 @@ qthinit(qthhdl_t *qthhdlp, void *(*alloc)(unsigned long), void (*free)(void *ptr
  *
  */
 QTHERR
-qthheadadd(qthhdl_t qthhdl, void *datap);
+qth_addh(qthhdl_t qthhdl, void *datap);
 
 /**
  * \brief
@@ -85,7 +85,7 @@ qthheadadd(qthhdl_t qthhdl, void *datap);
  *
  */
 QTHERR
-qthtailadd(qthhdl_t qthhdl, void *datap);
+qth_add(qthhdl_t qthhdl, void *datap);
 
 /**
  * \brief
@@ -96,25 +96,45 @@ qthtailadd(qthhdl_t qthhdl, void *datap);
  * data pointer
  *
  * \param[in]       qthhdl    handle to q
- * \param[out]      qerr      user data to add to queue
+ * \param[out]      qerr      QTHERR_OK or error code for operation
  *
  * \return          The data pointer from the removed head of the queue
  *
  */
 void *
-qthheadrem(qthhdl_t qthhdl, QTHERR *qerr);
+qth_remove(qthhdl_t qthhdl, QTHERR *qerr);
+
+/**
+ * \brief
+ * Iterate through data elements in the queue
+ *
+ * \details
+ * Returns the data element from the queue, sets the q handle
+ * for the next call iterate call.
+ *
+ * \param[in]       qthhdl    pointer to handle to q for iterating
+ * \param[in,out]   iterp     pointer to the iterator
+ *
+ * \return          The current data pointer from the queue, NULL if no more
+ *
+ * \note            Set the *iterp to the queue handle to start the iteration
+ *
+ */
+void *
+qth_iter(qthhdl_t qthhdl, void **iterp);
 
 /**
  * \brief
  * Frees queue
  *
  * \details
- * Frees all queue linkage and the queue handle. Does not free the data elements.
+ * Frees any queue elements, and the queue handle.
  *
- * \param[in]       qthhdl    handle to q
+ * \param[in]       qthhdl          handle to q
  *
- * \return          QTHERR_OK on success
+ * \return          QTHERR_OK       on success
+ *                  QTHERR_EMPTY    if queue was aleady empty (header freed)
  *
  */
 QTHERR
-qthfree(qthhdl_t qthhdl);
+qth_free(qthhdl_t qthhdl);

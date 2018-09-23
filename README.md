@@ -26,26 +26,30 @@ typedef enum {
     QTHERR_LAST
 } QTHERR;
 
-QTHERR qthinit(qthhdl_t *qthhdlp, void *(*alloc)(unsigned long), void (*free)(void *ptr));
-QTHERR qthheadadd(qthhdl_t qthhdl, void *datap);
-QTHERR qthtailadd(qthhdl_t qthhdl, void *datap);
-void *qthheadrem(qthhdl_t qthhdl, QTHERR *qerr);
-QTHERR qthfree(qthhdl_t qthhdl);
+QTHERR qth_init(qthhdl_t *qthhdlp, void *(*alloc)(unsigned long), void (*free)(void *ptr));
+QTHERR qth_addh(qthhdl_t qthhdl, void *datap);
+QTHERR qth_add(qthhdl_t qthhdl, void *datap);
+void *qth_iter(qthhdl_t qthhdl, void **iterp);
+void *qth_remove(qthhdl_t qthhdl, QTHERR *qerr);
+QTHERR qth_free(qthhdl_t qthhdl);
 
-The qthinit() function initializes a queue and sets the alloction and free functions
+The qth_init() function initializes a queue and sets the alloction and free functions.
 
-The qthheadadd() function adds a data element to the head of a queue.
+The qth_addh() function adds a data element to the head of a queue.
 
-The qthtailadd() function adds a data element to the tail of a queue.
+The qth_add() function adds a data element to the tail of a queue.
 
-The qthheadrem() function removes and returns the head of a queue.
+The qth_iter() function walks the data elements in a queue from head to tail.
 
-The qthfree() function frees any elements and the header of the quque.
+The qth_remove() function removes and returns the head of a queue.
+
+The qth_free() function frees any queue elements and the header.
 
 ```
 ## Motivation
 The benefits of this Queue library are:
   - O(1) add to head, add to tail, and remove from head operations
+  - Iterate through a queue without removing elements
   - The library manages all queue overhead and linkage
   - Uses user supplied allocation and free functions for managing queue linkage
 
@@ -56,21 +60,21 @@ int         arr[ARRSIZE];
 QTHERR      qerr;
 qthhdl_t    qhdl;
 
-qthinit(&qhdl, malloc, free);
+qth_init(&qhdl, malloc, free);
 for (i=0; i < ARRSIZE; i++)
 {
     arr[i] = i;
-    qerr = qthtailadd(qhdl, &arr[i]);
+    qerr = qth_add(qhdl, &arr[i]);
     printf("%d ", i);
 }
 printf("\nRemoving items from queue\n");
 for (i=0; i < ARRSIZE; i++)
 {
-        dp = qthheadrem(qhdl, &qerr);
+        dp = qth_remove(qhdl, &qerr);
         printf("%d ", *dp);
         assert(*dp == i);
 }
-assert(QTHERR_EMPTY == qthfree(qhdl));
+assert(QTHERR_EMPTY == qth_free(qhdl));
 ```
 ## Running the test code
 ```
