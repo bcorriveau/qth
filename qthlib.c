@@ -236,7 +236,7 @@ qth_iter(qthhdl_t qthhdl, void **iterp)
  * Frees queue
  *
  * \details
- * Frees any queue elements, and the queue handle.
+ * Frees any queue element linkage, and the queue handle.
  *
  * \param[in]       qthhdl          handle to q
  *
