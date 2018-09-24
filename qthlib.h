@@ -14,7 +14,7 @@
  * This queue library manages the allocation and freeing of the queue header and linkage.
  * The user does not add links to their own structures or manage a queue header.
  *
- * This queue manager uses the data poiners passed in and does not copy the data.
+ * This queue manager uses the data pointers passed in and does not copy the data.
  * Do not release the data while the queue is in use!
  * The passed in alloc function is used to allocate a queue header and 
  * element links, and the free function is used to release element links as 
@@ -128,7 +128,7 @@ qth_iter(qthhdl_t qthhdl, void **iterp);
  * Frees queue
  *
  * \details
- * Frees any queue elements, and the queue handle.
+ * Frees any queue element linkage, and the queue handle.
  *
  * \param[in]       qthhdl          handle to q
  *
